@@ -124,8 +124,8 @@ def compute_user_aggregates(df: DataFrame) -> DataFrame:
     return (
         df.groupBy("date", "user_id", "user_login")
         .agg(
-            F.count(
-                F.when(F.col("event_type") == "WatchEvent", F.lit(1))
+            F.countDistinct(
+                F.when(F.col("event_type") == "WatchEvent", F.col("repo_id"))
             ).alias("num_starred_projects"),
             F.count(
                 F.when(
