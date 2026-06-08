@@ -33,6 +33,7 @@ from github_aggregator.transformations import (
 
 _EVENTS = [
     Row(type="WatchEvent",       actor=Row(id=1, login="alice"), repo=Row(id=100, name="octocat/Hello-World"), payload=Row(action="started"), created_at="2024-01-05T10:00:00Z"),
+    Row(type="WatchEvent",       actor=Row(id=1, login="alice"), repo=Row(id=100, name="octocat/Hello-World"), payload=Row(action="started"), created_at="2024-01-05T10:30:00Z"),  # duplicate — same user, same repo
     Row(type="WatchEvent",       actor=Row(id=2, login="bob"),   repo=Row(id=100, name="octocat/Hello-World"), payload=Row(action="started"), created_at="2024-01-05T11:00:00Z"),
     Row(type="ForkEvent",        actor=Row(id=3, login="carol"), repo=Row(id=100, name="octocat/Hello-World"), payload=Row(action=None),      created_at="2024-01-05T12:00:00Z"),
     Row(type="IssuesEvent",      actor=Row(id=1, login="alice"), repo=Row(id=100, name="octocat/Hello-World"), payload=Row(action="opened"),  created_at="2024-01-05T13:00:00Z"),
@@ -89,6 +90,14 @@ class TestPipelineBusinessRules:
         user_row = user_agg.filter(F.col("user_id") == 1).collect()[0]
         total = user_row["num_starred_projects"] + user_row["num_issues_created"] + user_row["num_prs_created"]
         assert total == 2   # 1 star + 1 issue opened; PushEvent contributes 0
+
+    def test_starred_projects_counts_distinct_repos(self, user_agg):
+        """alice has 2 WatchEvent rows for the same repo -> num_starred_projects = 1.
+
+        Regression guard for the countDistinct(repo_id) fix: count() would return 2.
+        """
+        user_row = user_agg.filter(F.col("user_id") == 1).collect()[0]
+        assert user_row["num_starred_projects"] == 1
 
 
 # ── .json.gz read path ────────────────────────────────────────────────────────
