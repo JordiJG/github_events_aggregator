@@ -7,7 +7,8 @@ fixtures from conftest.py.  No I/O -- pure Spark DataFrame operations.
 Coverage:
   parse_events            - output schema contract; malformed rows filtered
   compute_repo_aggregates - required output fields; stars distinct-count; opened-only rule
-  compute_user_aggregates - required output fields; cross-repo aggregation; opened-only rule
+  compute_user_aggregates - required output fields; cross-repo aggregation; opened-only rule;
+                            starred-projects counts distinct repos (not raw WatchEvent rows)
 """
 
 from __future__ import annotations
@@ -111,3 +112,12 @@ class TestComputeUserAggregates:
         """DATE_A: alice closed 1 PR -- num_prs_created must remain 0."""
         row = _user_row(compute_user_aggregates(sample_events_df), datetime.date(2024, 1, 1), 1)
         assert row["num_prs_created"] == 0
+
+    def test_starred_projects_counts_distinct_repos(self, sample_events_df):
+        """DATE_B: alice fires 2 WatchEvents on the same repo -> num_starred_projects = 1.
+
+        Regression guard for the countDistinct(repo_id) fix: using count() instead
+        would return 2, over-counting duplicate WatchEvent rows for the same repo.
+        """
+        row = _user_row(compute_user_aggregates(sample_events_df), datetime.date(2024, 1, 2), 1)
+        assert row["num_starred_projects"] == 1
