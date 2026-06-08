@@ -1,0 +1,61 @@
+# ── Data files — NEVER commit raw downloads or outputs ──────────────────────
+# data/ covers raw downloads, all output formats, and the delta logs
+data/
+
+# Compressed event files (GHArchive)
+*.json.gz
+*.gz
+
+# Output formats
+*.parquet
+*.csv
+_delta_log/
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.pyc
+# ── Test / coverage artefacts ────────────────────────────────────────────────
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ── Virtual environments ─────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── IDE / OS ─────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── Jupyter ──────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Spark / Hadoop ───────────────────────────────────────────────────────────
+derby.log
+metastore_db/
+spark-warehouse/

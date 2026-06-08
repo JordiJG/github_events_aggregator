@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "github-aggregator"
+version = "1.0.0"
+description = "Daily GitHub event aggregator — repositories and users — powered by PySpark"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Jordi JG" }]
+keywords = ["github", "spark", "data-engineering", "gharchive"]
+dependencies = [
+    "pyspark>=4.0.0",
+    "delta-spark>=4.0.0",
+    "requests>=2.31.0",
+    "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-mock>=3.12.0",
+    "pytest-cov>=4.1.0",
+]
+dashboard = [
+    "streamlit>=1.32.0",
+    "pandas>=2.0.0",
+    "pyarrow>=14.0.0",
+]
+
+[project.scripts]
+download-gharchive = "github_aggregator.downloader:main"
+run-aggregator     = "github_aggregator.spark_job:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "delta: tests that require Delta Lake JARs from Maven Central",
+]
